@@ -1,4 +1,5 @@
 import Script from 'next/script'
+import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Phone, CheckCircle, Clock, MapPin } from 'lucide-react'
 
@@ -104,11 +105,11 @@ export default function DemoPage() {
             />
 
             {/* Fallback manuel si Next/Script ne passe pas les data attributes correctement */}
-            <kameo-widget
-                data-id="REPLACE_WITH_REAL_ARTISAN_ID"
-                proxy-url={process.env.NEXT_PUBLIC_SUPABASE_URL + "/functions/v1"}
-            ></kameo-widget>
-
+            {/* Fallback manuel si Next/Script ne passe pas les data attributes correctement */}
+            {React.createElement('kameo-widget', {
+                'data-id': "REPLACE_WITH_REAL_ARTISAN_ID",
+                'proxy-url': process.env.NEXT_PUBLIC_SUPABASE_URL + "/functions/v1"
+            })}
         </div>
     )
 }
