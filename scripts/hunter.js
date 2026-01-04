@@ -224,10 +224,13 @@ async function processBatch(query, apiKey, browser, job, city) {
             const screenshotBuffer = await page.screenshot({ encoding: 'base64' });
             await page.close();
 
+            console.log("      ☁️ Uploading Screenshot...");
             const fileName = `ghost_${place.place_id}.png`;
             const { error: uploadError } = await supabase.storage
                 .from('prospects')
                 .upload(fileName, Buffer.from(screenshotBuffer, 'base64'), { upsert: true, contentType: 'image/png' });
+
+            if (uploadError) console.log("      ⚠️ Upload Error from Supabase:", uploadError.message);
 
             let screenshotUrl = null;
             if (!uploadError) {
@@ -235,6 +238,7 @@ async function processBatch(query, apiKey, browser, job, city) {
                 screenshotUrl = publicUrl + `?t=${Date.now()}`;
             }
 
+            console.log("      💾 Saving to DB...");
             const { error: dbError } = await supabase.from('kameo_prospects').upsert({
                 place_id: place.place_id,
                 business_name: name,
@@ -265,7 +269,7 @@ async function processBatch(query, apiKey, browser, job, city) {
 function extractEmail(html) {
     const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
     const matches = html.match(emailRegex) || [];
-    const blacklist = ['sentry', 'wix', 'wordpress', 'react', 'noreply', 'domain', 'sentry.io', 'example', '2x.png', '.jpg', '.js', '.css', 'bootstrap', 'google', 'cloudflare'];
+    const blacklist = ['sentry', 'wix', 'wordpress', 'react', 'noreply', 'domain', 'sentry.io', 'example', '2x.png', '.jpg', '.js', '.css', 'bootstrap', 'google', 'cloudflare', 'fontawesome'];
     const valid = matches.filter(e => !blacklist.some(b => e.toLowerCase().includes(b)));
     if (valid.length === 0) return null;
     return valid.find(e => e.includes('contact') || e.includes('info') || e.includes('devis')) || valid[0];
