@@ -21,7 +21,7 @@ jobs:
 
       - name: Install Hunter Dependencies
         # Only installing what the script needs to keep it fast
-        run: npm install puppeteer @supabase/supabase-js @google/generative-ai dotenv
+        run: npm install puppeteer @supabase/supabase-js @google/generative-ai dotenv axios
 
       - name: Run Hunter Script
         env:
