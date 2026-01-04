@@ -61,8 +61,29 @@ async function processBatch(query, apiKey, browser, job, city) {
         return;
     }
 
+    const JOB_TRANSLATIONS = {
+        'Plumber': 'Plombier',
+        'Locksmith': 'Serrurier',
+        'Glazier': 'Vitrier',
+        'Electrician': 'Électricien'
+    };
+
+    // ... inside processBatch loop ...
+
     for (const place of places) {
         const name = place.name;
+
+        // CHECK 0: DEDUPLICATION (Don't spend credits on existing prospects)
+        const { data: existing } = await supabase
+            .from('kameo_prospects')
+            .select('id')
+            .eq('place_id', place.place_id)
+            .maybeSingle();
+
+        if (existing) {
+            console.log(`      ⏩ Already in DB -> Skip`);
+            continue;
+        }
 
         // CHECK A: PROOF OF LIFE
         if (!place.user_ratings_total || place.user_ratings_total < 10) continue;
@@ -239,10 +260,14 @@ async function processBatch(query, apiKey, browser, job, city) {
             }
 
             console.log("      💾 Saving to DB...");
+
+            // Normalize Job Title to French
+            const frenchJob = JOB_TRANSLATIONS[job] || job;
+
             const { error: dbError } = await supabase.from('kameo_prospects').upsert({
                 place_id: place.place_id,
                 business_name: name,
-                business_type: job,
+                business_type: frenchJob,
                 city: city,
                 url: url,
                 rating: place.rating,
