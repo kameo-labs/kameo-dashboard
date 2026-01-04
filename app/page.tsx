@@ -43,16 +43,18 @@ export default async function LandingPage(props: {
                         </div>
                         <span>Kameo</span>
                     </div>
-                    <nav className="flex gap-4">
-                        <Link href="/login">
-                            <Button variant="ghost" className="text-slate-600 hover:text-slate-900 hover:bg-slate-100">Connexion</Button>
-                        </Link>
-                        <Link href="/login?mode=signup">
-                            <Button className="bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200">Commencer</Button>
-                        </Link>
-                    </nav>
-                </div>
-            </header>
+                    <Link href="/demo">
+                        <Button variant="ghost" className="text-amber-600 hover:text-amber-700 hover:bg-amber-50">Démonstration</Button>
+                    </Link>
+                    <Link href="/login">
+                        <Button variant="ghost" className="text-slate-600 hover:text-slate-900 hover:bg-slate-100">Connexion</Button>
+                    </Link>
+                    <Link href="/login?mode=signup">
+                        <Button className="bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200">Commencer</Button>
+                    </Link>
+                </nav>
+        </div>
+            </header >
 
             <main className="flex-1">
                 <Hero />
@@ -92,7 +94,7 @@ export default async function LandingPage(props: {
                     </nav>
                 </div>
             </footer>
-        </div>
+        </div >
     );
 }
 
