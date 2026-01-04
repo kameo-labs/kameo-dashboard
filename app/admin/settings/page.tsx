@@ -42,11 +42,15 @@ export default async function AdminSettings() {
                         <CardDescription>Ajoutez un membre à l&apos;équipe Kameo. Il pourra se connecter immédiatement via Email.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form action={inviteAdmin} className="flex gap-4">
-                            <Input name="email" type="email" placeholder="nouveau@kameo.app" required className="max-w-md" />
-                            <Button type="submit">Envoyer l&apos;Invitation</Button>
-                        </form>
-                    </CardContent>
+                        <CardContent>
+                            <form action={async (formData) => {
+                                'use server'
+                                await inviteAdmin(formData)
+                            }} className="flex gap-4">
+                                <Input name="email" type="email" placeholder="nouveau@kameo.app" required className="max-w-md" />
+                                <Button type="submit">Envoyer l&apos;Invitation</Button>
+                            </form>
+                        </CardContent>
                 </Card>
 
                 {/* ADMIN LIST */}
@@ -63,7 +67,10 @@ export default async function AdminSettings() {
                                         <div className="text-xs text-gray-400">Ajouté le {new Date(a.created_at).toLocaleDateString()}</div>
                                     </div>
                                     {a.id !== user.id && (
-                                        <form action={removeAdmin}>
+                                        <form action={async (formData) => {
+                                            'use server'
+                                            await removeAdmin(formData)
+                                        }}>
                                             <input type="hidden" name="id" value={a.id} />
                                             <Button variant="destructive" size="sm">Révoquer</Button>
                                         </form>
