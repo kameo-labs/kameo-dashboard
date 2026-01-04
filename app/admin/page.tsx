@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/admin/data-table'
 import { columns } from '@/components/admin/columns'
 import { Briefcase, Settings } from 'lucide-react'
+import { ModeToggle } from '@/components/mode-toggle'
 
 export default async function AdminDashboard() {
     const supabase = await createClient()
@@ -55,6 +56,8 @@ export default async function AdminDashboard() {
         .select('*')
         .order('created_at', { ascending: false })
 
+
+
     return (
         <div className="p-8 max-w-[1600px] mx-auto">
             <header className="flex justify-between items-center mb-8">
@@ -62,9 +65,10 @@ export default async function AdminDashboard() {
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
                         Kameo Tower 🗼
                     </h1>
-                    <p className="text-gray-600">Centre de contrôle des Leads ({prospects?.length || 0})</p>
+                    <p className="text-gray-600 dark:text-gray-400">Centre de contrôle des Leads ({prospects?.length || 0})</p>
                 </div>
                 <div className="flex gap-4 items-center">
+                    <ModeToggle />
                     <Button variant="ghost" asChild>
                         <a href="/admin/settings" className="flex items-center gap-2"><Settings className="h-4 w-4" /> Paramètres</a>
                     </Button>

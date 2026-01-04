@@ -64,7 +64,14 @@ export default async function LeadsPage() {
                                             {new Date(lead.created_at).toLocaleDateString()} {new Date(lead.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </TableCell>
                                         <TableCell className="font-medium">
-                                            {lead.customer_phone ? (
+                                            {lead.status === 'locked' ? (
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span className="font-mono text-muted-foreground bg-gray-100 px-2 py-1 rounded">
+                                                        {lead.customer_phone.substring(0, 4)} ** ** **
+                                                    </span>
+                                                    <Badge variant="destructive" className="text-[10px] h-4">🔒 Verrouillé</Badge>
+                                                </div>
+                                            ) : lead.customer_phone ? (
                                                 <a href={`tel:${lead.customer_phone}`} className="flex items-center hover:text-blue-600">
                                                     <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
                                                     {lead.customer_phone}

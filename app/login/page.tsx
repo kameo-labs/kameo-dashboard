@@ -50,7 +50,7 @@ function LoginForm() {
             // Display detailed error
             setMessage(error.message)
         } else {
-            setMessage('Lien envoyé ! Vérifiez votre boîte mail (et Mailpit en local).')
+            setMessage('Lien envoyé ! Vérifiez votre boîte mail.')
         }
         setLoading(false)
     }

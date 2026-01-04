@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LayoutDashboard, Users, MessageSquare, Settings, Shield, Code, LogOut } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default async function DashboardLayout({
     children,
@@ -90,7 +91,10 @@ export default async function DashboardLayout({
                             <span className="text-xs text-muted-foreground capitalize">{artisan.business_type}</span>
                         </div>
                     </div>
-                    <SignOutButton />
+                    <div className="flex gap-2">
+                        <ModeToggle />
+                        <SignOutButton />
+                    </div>
                 </div>
             </aside>
 
