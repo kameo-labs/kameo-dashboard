@@ -6,65 +6,78 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function sendOutreachEmails(prospectIds: string[]) {
-    if (!prospectIds || prospectIds.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
+  if (!prospectIds || prospectIds.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
 
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    // 1. Fetch Prospects
-    const { data: prospects, error } = await supabase
+  // 1. Fetch Prospects
+  const { data: prospects, error } = await supabase
+    .from("kameo_prospects")
+    .select("*")
+    .in("id", prospectIds)
+
+  if (error || !prospects) {
+    console.error("Error fetching prospects", error)
+    return { success: false, message: "Erreur lors de la récupération des prospects" }
+  }
+
+  let successCount = 0
+  let failureCount = 0
+
+  // 2. Loop & Send
+  for (const prospect of prospects) {
+    if (!prospect.email) {
+      failureCount++
+      continue
+    }
+
+    try {
+      await resend.emails.send({
+        from: "Kameo <onboarding@resend.dev>", // Or your verified domain
+        to: prospect.email,
+        subject: `Une opportunité pour ${prospect.business_name} ? 🦎`,
+        html: generateEmailTemplate(prospect)
+      })
+
+      // 3. Update Status
+      await supabase
         .from("kameo_prospects")
-        .select("*")
-        .in("id", prospectIds)
+        .update({ hunt_status: "contacted", contacted_at: new Date().toISOString() })
+        .eq("id", prospect.id)
 
-    if (error || !prospects) {
-        console.error("Error fetching prospects", error)
-        return { success: false, message: "Erreur lors de la récupération des prospects" }
+      successCount++
+    } catch (err) {
+      console.error(`Failed to send email to ${prospect.email}`, err)
+      failureCount++
     }
+  }
 
-    let successCount = 0
-    let failureCount = 0
+  return {
+    success: true,
+    message: `${successCount} emails envoyés avec succès (${failureCount} échecs).`
+  }
+}
 
-    // 2. Loop & Send
-    for (const prospect of prospects) {
-        if (!prospect.email) {
-            failureCount++
-            continue
-        }
+export async function updateProspectStatus(id: string, status: string) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("kameo_prospects")
+    .update({ hunt_status: status })
+    .eq("id", id)
 
-        try {
-            await resend.emails.send({
-                from: "Kameo <onboarding@resend.dev>", // Or your verified domain
-                to: prospect.email,
-                subject: `Une opportunité pour ${prospect.business_name} ? 🦎`,
-                html: generateEmailTemplate(prospect)
-            })
+  if (error) return { success: false, message: error.message }
 
-            // 3. Update Status
-            await supabase
-                .from("kameo_prospects")
-                .update({ hunt_status: "contacted", contacted_at: new Date().toISOString() })
-                .eq("id", prospect.id)
-
-            successCount++
-        } catch (err) {
-            console.error(`Failed to send email to ${prospect.email}`, err)
-            failureCount++
-        }
-    }
-
-    return {
-        success: true,
-        message: `${successCount} emails envoyés avec succès (${failureCount} échecs).`
-    }
+  // Revalidate via refresh (handled by client usually, or revalidatePath if on page)
+  return { success: true }
 }
 
 function generateEmailTemplate(prospect: any) {
-    const screenshotUrl = prospect.demo_screenshot_url || "https://placehold.co/600x400/e2e8f0/64748b?text=Votre+Site+Web"
-    const dashboardUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kameo.app" // Adjust for Production
+  const screenshotUrl = prospect.demo_screenshot_url || "https://placehold.co/600x400/e2e8f0/64748b?text=Votre+Site+Web"
+  const dashboardUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kameo.app" // Adjust for Production
 
-    // PROFESSIONAL & CLEAN TEMPLATE
-    // Note: Inline CSS is required for emails.
-    return `
+  // PROFESSIONAL & CLEAN TEMPLATE
+  // Note: Inline CSS is required for emails.
+  return `
 <!DOCTYPE html>
 <html>
 <head>

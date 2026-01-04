@@ -3,6 +3,9 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal, Eye, ExternalLink } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { updateProspectStatus } from "@/app/admin/actions"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -37,7 +40,7 @@ export type Prospect = {
     url: string
 }
 
-import { Checkbox } from "@/components/ui/checkbox"
+
 
 export const columns: ColumnDef<Prospect>[] = [
     {
@@ -181,8 +184,22 @@ export const columns: ColumnDef<Prospect>[] = [
                                 Copier Email
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Marquer comme Contacté</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
+                            <DropdownMenuItem onClick={async () => {
+                                const res = await updateProspectStatus(prospect.id, 'contacted')
+                                if (res.success) {
+                                    toast.success("Statut mis à jour : Contacté")
+                                    window.location.reload() // Force Refresh to update UI
+                                } else {
+                                    toast.error("Erreur mise à jour")
+                                }
+                            }}>
+                                Marquer comme Contacté
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" onClick={async () => {
+                                // Logic for delete if needed
+                            }}>
+                                Supprimer
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
