@@ -269,7 +269,7 @@ async function processBatch(query, apiKey, browser, job, city) {
 function extractEmail(html) {
     const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
     const matches = html.match(emailRegex) || [];
-    const blacklist = ['sentry', 'wix', 'wordpress', 'react', 'noreply', 'domain', 'sentry.io', 'example', '2x.png', '.jpg', '.js', '.css', 'bootstrap', 'google', 'cloudflare', 'fontawesome'];
+    const blacklist = ['sentry', 'wix', 'wordpress', 'react', 'noreply', 'domain', 'sentry.io', 'example', '2x.png', '.jpg', '.js', '.css', 'bootstrap', 'google', 'cloudflare', 'fontawesome', 'core'];
     const valid = matches.filter(e => !blacklist.some(b => e.toLowerCase().includes(b)));
     if (valid.length === 0) return null;
     return valid.find(e => e.includes('contact') || e.includes('info') || e.includes('devis')) || valid[0];
