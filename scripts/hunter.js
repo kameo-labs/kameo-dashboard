@@ -5,8 +5,20 @@ const puppeteer = require('puppeteer');
 const { createClient } = require('@supabase/supabase-js');
 
 // --- 3. TARGETING REFINEMENT ---
-const CITIES = ['Neuilly-sur-Seine', 'Boulogne-Billancourt', 'Levallois-Perret', 'Versailles', 'Saint-Maur-des-Fossés', 'Rueil-Malmaison', 'Courbevoie'];
-const JOBS = ['Plombier', 'Serrurier', 'Vitrier', 'Débouchage canalisation'];
+// --- 3. TARGETING REFINEMENT ---
+const CITIES = [
+    // Top 20 French Cities
+    'Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Montpellier', 'Strasbourg', 'Bordeaux', 'Lille',
+    'Rennes', 'Reims', 'Saint-Étienne', 'Toulon', 'Le Havre', 'Grenoble', 'Dijon', 'Angers', 'Nîmes', 'Villeurbanne',
+    // IDF Suburbs (Rich Areas)
+    'Neuilly-sur-Seine', 'Boulogne-Billancourt', 'Levallois-Perret', 'Versailles', 'Rueil-Malmaison', 'Courbevoie', 'Issy-les-Moulineaux'
+];
+
+const JOBS = [
+    'Plombier', 'Serrurier', 'Vitrier', 'Débouchage canalisation',
+    'Électricien', 'Chauffagiste', 'Couvreur', 'Menuisier', 'Maçon', 'Peintre', 'Paysagiste', 'Climatisation'
+];
+
 const FORBIDDEN_TOOLS = ['intercom', 'crisp', 'drift', 'tawk.to', 'zendesk', 'hubspot', 'whatsapp-widget', 'facebook-chat'];
 
 // --- SUPABASE CLIENT ---
