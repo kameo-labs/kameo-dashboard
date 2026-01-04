@@ -72,8 +72,8 @@ export default async function AdminDashboard() {
                     <Button variant="ghost" asChild>
                         <a href="/admin/settings" className="flex items-center gap-2"><Settings className="h-4 w-4" /> Paramètres</a>
                     </Button>
-                    <div className="h-6 w-px bg-gray-200"></div>
-                    <span className="text-sm font-medium bg-gray-100 px-3 py-1 rounded-full text-gray-600">{admin.email}</span>
+                    <div className="h-6 w-px bg-border"></div>
+                    <span className="text-sm font-medium bg-muted px-3 py-1 rounded-full text-muted-foreground">{admin.email}</span>
                     <form action="/auth/signout" method="post">
                         <Button variant="outline" size="sm">Déconnexion</Button>
                     </form>
@@ -81,7 +81,7 @@ export default async function AdminDashboard() {
             </header>
 
             <div className="grid gap-6">
-                <div className="bg-white rounded-lg border shadow-sm p-1">
+                <div className="bg-card text-card-foreground rounded-lg border shadow-sm p-1">
                     <DataTable columns={columns} data={prospects || []} />
                 </div>
             </div>
