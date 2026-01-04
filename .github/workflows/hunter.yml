@@ -1,27 +1,36 @@
 name: Hunter Scraper (Daily)
-
 on:
   schedule:
-    # Runs at 08:00 UTC every day
     - cron: '0 8 * * *'
-  workflow_dispatch: # Allows manual run from GitHub Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   scrape-artisans:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js with Cache
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install Hunter Dependencies
-        # Only installing what the script needs to keep it fast
-        run: npm install puppeteer @supabase/supabase-js @google/generative-ai dotenv axios
+      - name: Cache Puppeteer
+        uses: actions/cache@v4
+        id: puppeteer-cache
+        with:
+          path: ~/.cache/puppeteer
+          key: ${{ runner.os }}-puppeteer-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Run Hunter Script
         env:
@@ -29,4 +38,5 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PUPPETEER_ARGS: '--no-sandbox --disable-setuid-sandbox'
         run: node scripts/hunter.js
