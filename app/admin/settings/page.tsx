@@ -42,15 +42,14 @@ export default async function AdminSettings() {
                         <CardDescription>Ajoutez un membre à l&apos;équipe Kameo. Il pourra se connecter immédiatement via Email.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <CardContent>
-                            <form action={async (formData) => {
-                                'use server'
-                                await inviteAdmin(formData)
-                            }} className="flex gap-4">
-                                <Input name="email" type="email" placeholder="nouveau@kameo.app" required className="max-w-md" />
-                                <Button type="submit">Envoyer l&apos;Invitation</Button>
-                            </form>
-                        </CardContent>
+                        <form action={async (formData) => {
+                            'use server'
+                            await inviteAdmin(formData)
+                        }} className="flex gap-4">
+                            <Input name="email" type="email" placeholder="nouveau@kameo.app" required className="max-w-md" />
+                            <Button type="submit">Envoyer l&apos;Invitation</Button>
+                        </form>
+                    </CardContent>
                 </Card>
 
                 {/* ADMIN LIST */}
