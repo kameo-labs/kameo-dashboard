@@ -249,7 +249,11 @@ async function processBatch(query, apiKey, browser, job, city) {
                 demo_screenshot_url: screenshotUrl
             }, { onConflict: 'place_id' });
 
-            if (!dbError) console.log(`      ✅ SAVED!`);
+            if (!dbError) {
+                console.log(`      ✅ SAVED!`);
+            } else {
+                console.error(`      ❌ DB Upsert Error: ${JSON.stringify(dbError)}`);
+            }
 
         } catch (err) {
             console.error(`      ❌ Error: ${err.message}`);
