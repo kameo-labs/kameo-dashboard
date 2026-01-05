@@ -32,7 +32,11 @@ export default function EmailTemplatesPage() {
         if (data) {
             setTemplate(data)
         } else if (error) {
-            toast.error("Erreur chargement template")
+            console.error("Supabase Error:", error)
+            toast.error(`Erreur: ${error.message}`)
+            // Force error display
+            const debugDiv = document.getElementById('debug-error')
+            if (debugDiv) debugDiv.innerText = JSON.stringify(error, null, 2)
         }
         setLoading(false)
     }
@@ -79,13 +83,21 @@ export default function EmailTemplatesPage() {
     if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>
 
     if (!template) return (
-        <div className="p-8 text-center">
-            <p>Aucun template actif trouvé. Veuillez exécuter la migration SQL.</p>
+        <div className="p-8 text-center bg-red-50 text-red-600 rounded">
+            <h2 className="font-bold">Erreur Technique</h2>
+            <p>Impossible de charger le template.</p>
+            <div className="text-left bg-gray-900 text-white p-4 rounded mt-4 overflow-auto max-w-2xl mx-auto font-mono text-xs">
+                <p>Supabase URL: {process.env.NEXT_PUBLIC_SUPABASE_URL}</p>
+                <p>Table: kameo_email_templates</p>
+                <p>Test Date: {new Date().toISOString()}</p>
+            </div>
+            <Button onClick={fetchTemplate} className="mt-4">Réessayer</Button>
         </div>
     )
 
     return (
         <div className="p-6 max-w-[1800px] mx-auto h-[calc(100vh-100px)] flex flex-col gap-4">
+            <div className="text-left bg-gray-900 text-white p-4 rounded mt-4 hidden" id="debug-error"></div>
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
                     Éditeur de Template 💌
