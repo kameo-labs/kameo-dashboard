@@ -22,12 +22,7 @@ export default function EmailTemplatesPage() {
     async function fetchTemplate() {
         setLoading(true)
         const { data, error } = await supabase
-            .from('kameo_email_templates')
-            .select('*')
-            .eq('active', true)
-            .order('updated_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
+            .rpc('get_active_email_template')
 
         if (data) {
             setTemplate(data)
