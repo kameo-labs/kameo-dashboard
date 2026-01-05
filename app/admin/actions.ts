@@ -36,7 +36,9 @@ export async function sendOutreachEmails(prospectIds: string[]) {
     .from('kameo_email_templates')
     .select('*')
     .eq('active', true)
-    .single()
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   // Use DB template OR Fallback to default function if missing (for safety)
   const useDbTemplate = !!templateData

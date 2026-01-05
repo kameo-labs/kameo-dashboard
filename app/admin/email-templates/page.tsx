@@ -25,7 +25,9 @@ export default function EmailTemplatesPage() {
             .from('kameo_email_templates')
             .select('*')
             .eq('active', true)
-            .single()
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
 
         if (data) {
             setTemplate(data)
