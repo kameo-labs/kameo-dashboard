@@ -31,7 +31,20 @@ export async function sendOutreachEmails(prospectIds: string[]) {
   let successCount = 0
   let failureCount = 0
 
-  // 2. Loop & Send
+  // 2. Fetch Active Template
+  const { data: templateData } = await supabase
+    .from('kameo_email_templates')
+    .select('*')
+    .eq('active', true)
+    .single()
+
+  // Use DB template OR Fallback to default function if missing (for safety)
+  const useDbTemplate = !!templateData
+
+  let successCount = 0
+  let failureCount = 0
+
+  // 3. Loop & Send
   for (const prospect of prospects) {
     if (!prospect.email) {
       failureCount++
@@ -39,14 +52,24 @@ export async function sendOutreachEmails(prospectIds: string[]) {
     }
 
     try {
+      let subject = `Une opportunité pour ${prospect.business_name} ? 🦎`
+      let html = ""
+
+      if (useDbTemplate) {
+        subject = templateData.subject.replace('{{business_name}}', prospect.business_name || 'Artisan')
+        html = fillTemplate(templateData.html_content, prospect)
+      } else {
+        html = generateEmailTemplate(prospect)
+      }
+
       await resend.emails.send({
         from: "Kameo <onboarding@resend.dev>", // Or your verified domain
         to: prospect.email,
-        subject: `Une opportunité pour ${prospect.business_name} ? 🦎`,
-        html: generateEmailTemplate(prospect)
+        subject: subject,
+        html: html
       })
 
-      // 3. Update Status
+      // 4. Update Status
       await supabase
         .from("kameo_prospects")
         .update({ hunt_status: "contacted", contacted_at: new Date().toISOString() })
@@ -65,43 +88,29 @@ export async function sendOutreachEmails(prospectIds: string[]) {
   }
 }
 
-export async function updateProspectStatus(id: string, status: string) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from("kameo_prospects")
-    .update({ hunt_status: status })
-    .eq("id", id)
+// Helper to replace placeholders in DB Template
+function fillTemplate(htmlContent: string, prospect: any) {
+  const screenshotUrl = prospect.demo_screenshot_url || "https://placehold.co/600x400/e2e8f0/64748b?text=Votre+Site+Web"
+  const dashboardUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kameo.app"
 
-  if (error) return { success: false, message: error.message }
+  let html = htmlContent
+  const replacements: Record<string, string> = {
+    '{{business_name}}': prospect.business_name || 'Artisan',
+    '{{business_type}}': prospect.business_type || 'Votre Assistant',
+    '{{dashboard_url}}': dashboardUrl,
+    '{{url_encoded}}': encodeURIComponent(prospect.url || ''),
+    '{{phone}}': prospect.phone || '',
+    '{{screenshot_url}}': screenshotUrl
+  }
 
-  // Revalidate via refresh (handled by client usually, or revalidatePath if on page)
-  return { success: true }
+  Object.entries(replacements).forEach(([key, value]) => {
+    html = html.replace(new RegExp(key, 'g'), value)
+  })
+
+  return html
 }
 
-export async function deleteProspects(ids: string[]) {
-  if (!ids || ids.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from("kameo_prospects")
-    .delete()
-    .in("id", ids)
-
-  if (error) return { success: false, message: error.message }
-  return { success: true, message: `${ids.length} prospects supprimés` }
-}
-
-export async function bulkUpdateStatus(ids: string[], status: string) {
-  if (!ids || ids.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from("kameo_prospects")
-    .update({ hunt_status: status })
-    .in("id", ids)
-
-  if (error) return { success: false, message: error.message }
-  return { success: true, message: `${ids.length} statuts mis à jour` }
-}
-
+// Keep legacy function as fallback
 function generateEmailTemplate(prospect: any) {
   const screenshotUrl = prospect.demo_screenshot_url || "https://placehold.co/600x400/e2e8f0/64748b?text=Votre+Site+Web"
   const dashboardUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://kameo.app" // Adjust for Production

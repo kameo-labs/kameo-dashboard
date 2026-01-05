@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/admin/data-table'
 import { columns } from '@/components/admin/columns'
-import { Briefcase, Settings } from 'lucide-react'
+import { Briefcase, Settings, Mail } from 'lucide-react'
 import { ModeToggle } from '@/components/mode-toggle'
 
 export default async function AdminDashboard() {
@@ -69,6 +69,9 @@ export default async function AdminDashboard() {
                 </div>
                 <div className="flex gap-4 items-center">
                     <ModeToggle />
+                    <Button variant="ghost" asChild>
+                        <a href="/admin/email-templates" className="flex items-center gap-2"><Mail className="h-4 w-4" /> Modèles</a>
+                    </Button>
                     <Button variant="ghost" asChild>
                         <a href="/admin/settings" className="flex items-center gap-2"><Settings className="h-4 w-4" /> Paramètres</a>
                     </Button>
