@@ -182,3 +182,38 @@ function generateEmailTemplate(prospect: any) {
 </html>
     `
 }
+
+export async function updateProspectStatus(id: string, status: string) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("kameo_prospects")
+    .update({ hunt_status: status })
+    .eq("id", id)
+
+  if (error) return { success: false, message: error.message }
+  return { success: true }
+}
+
+export async function deleteProspects(ids: string[]) {
+  if (!ids || ids.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("kameo_prospects")
+    .delete()
+    .in("id", ids)
+
+  if (error) return { success: false, message: error.message }
+  return { success: true, message: `${ids.length} prospects supprimés` }
+}
+
+export async function bulkUpdateStatus(ids: string[], status: string) {
+  if (!ids || ids.length === 0) return { success: false, message: "Aucun prospect sélectionné" }
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from("kameo_prospects")
+    .update({ hunt_status: status })
+    .in("id", ids)
+
+  if (error) return { success: false, message: error.message }
+  return { success: true, message: `${ids.length} statuts mis à jour` }
+}
