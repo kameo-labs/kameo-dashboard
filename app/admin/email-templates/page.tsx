@@ -24,7 +24,9 @@ export default function EmailTemplatesPage() {
         const { data, error } = await supabase
             .rpc('get_active_email_template')
 
-        if (data) {
+        if (data && Array.isArray(data) && data.length > 0) {
+            setTemplate(data[0])
+        } else if (data && !Array.isArray(data)) {
             setTemplate(data)
         } else if (error) {
             console.error("Supabase Error:", error)
