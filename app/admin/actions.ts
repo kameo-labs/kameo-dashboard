@@ -41,8 +41,7 @@ export async function sendOutreachEmails(prospectIds: string[]) {
   // Use DB template OR Fallback to default function if missing (for safety)
   const useDbTemplate = !!templateData
 
-  let successCount = 0
-  let failureCount = 0
+
 
   // 3. Loop & Send
   for (const prospect of prospects) {
